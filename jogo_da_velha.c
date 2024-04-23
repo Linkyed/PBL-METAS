@@ -2,6 +2,7 @@
 #include <stdlib.h>
 //SUBSTITUIR PELA DO LINUX
 #include <windows.h>
+#include <fcntl.h>
 
 // Verifica se houve um vencedor e qual dos jogadores que foi e tambem verifica se ocorreu um empate
 char verificar_vencedor (char matriz[3][3]){
@@ -100,6 +101,49 @@ void resetar_jogo(int *jogador, int *rodada, int *coordenada_x, int *coordenada_
     *coordenada_y = 0;
 }
 
+int movimento_mouse(int fd, unsigned char data[3], int *coordenadas){
+    int bytes = read(fd, data, sizeof(data)); // Abre o arquivo MICE para leitura dos eventos de input que o mouse esta enviando
+
+    int left = 0 ;
+    int middle = 0;
+    int right = 0;
+    int cord_X = 0;
+    int cord_Y = 0;
+
+    signed char x, y;
+
+        if(bytes > 0)
+        {
+            left = data[0] & 0x1; // Lê o 1º LSB e se for igual a 1 significa que o botão esquerdo foi pressionado então left = 1 tambem
+            right = data[0] & 0x2; // Lê o 2º LSB e se for igual a 1 significa que o botão direito foi pressionado então right = 1 tambem
+            middle = data[0] & 0x4;// Lê o 4º LSB e se for igual a 1 significa que o botão do meio foi pressionado então middle = 1 tambem
+
+            x = data[1]; // Lê o segundo pack que é responsavel por indicar a movimentação do mouse no eixo X
+            y = data[2]; // Lê o terceiro pack que é responsavel por indicar a movimentação do mouse no eixo Y
+            //printf("x=%d, y=%d, btn_esqueda=%d, btn_meio=%d, btn_direito=%d\n", x, y, left, middle, right);
+            if (x > 0 && cord_X < 300){
+                coordenadas[0] += 1;
+            }
+            else if (x < 0 && cord_X > 0){
+                coordenadas[0] -= 1;
+            }
+
+            if (y > 0 && cord_Y > 0){
+                coordenadas[1] -= 1;
+            }
+            else if (y < 0 && cord_Y < 300){
+                coordenadas[1] += 1;
+            }
+            
+            if (left == 1){
+                return 1;
+            }
+            return 0;
+            //printf("Coordenada X: %d\n", cord_X);
+            //system("clear");
+        }   
+}
+
 int main()
 {
     
@@ -119,18 +163,38 @@ int main()
     int coordenada_da_jogada_matriz[2] = {0, 0};
     char comando;
 
+    const char *pDevice = "/dev/input/mice";
+    int fd = open(pDevice, O_RDWR);
+    unsigned char data[3];
+
+    if(fd == -1)
+    {
+        printf("ERROR ao abrir arquivo %s\n", pDevice);
+        return -1;
+    }
+    
+    int coordenadas_atuais[2] = {0, 0};
+
+    int quadrante_selecionado = 0;
+
+    int confirma_jogada = 0;
+
     while (1){
         //Limpando o console anterior e imprimindo o novo tabuleiro junto de algumas informações para os usuarios
         system("cls");
         imprimir_tabuleiro(tabuleiro);
-        int quadrante_selecionado = quadrante_atual(cordenada_x, cordenada_y);
+
+        confirma_jogada = movimento_mouse(fd, data, coordenadas_atuais);
+
+        quadrante_selecionado = quadrante_atual(coordenadas_atuais[0], coordenadas_atuais[1]);
         printf("\nRodada Atual: %d\n", rodada);
+        
         printf("O quadrante que o jogador %d esta selecionando e: %d\n", jogador_atual+1, quadrante_selecionado);
         printf("Se deseja realizar a jogada neste quadrante digite a letra C: ");
 
-        comando = getchar();
+        //comando = getchar();
 
-        //Será trocado pela logica do mouse
+        /*/Será trocado pela logica do mouse
         if ((comando == 'D' || comando == 'd') && cordenada_x < 300) //Mouse se movendo no eixo X para direita
             cordenada_x += 50;
         else if ((comando == 'A' || comando == 'a') && cordenada_x > 0) //Mouse se movendo no eixo X para esquerda
@@ -139,7 +203,9 @@ int main()
             cordenada_y += 50;
         else if ((comando == 'W' || comando == 'w') && cordenada_y > 0) //Mouse se movendo no eixo Y para cima
             cordenada_y -= 50;
-        else if ((comando == 'C' || comando == 'c')){ //Clique do mouse
+        */  
+       
+        if (confirma_jogada){ //Clique do mouse
             int confirmacao = realizar_jogada(&jogador_atual, quadrante_selecionado, coordenada_da_jogada_matriz, tabuleiro, &rodada);
             printf("Linha %d, Coluna %d", coordenada_da_jogada_matriz[0], coordenada_da_jogada_matriz[1]);
             if (confirmacao == 0){
