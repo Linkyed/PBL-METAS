@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 //SUBSTITUIR PELA DO LINUX
-#include <windows.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 // Verifica se houve um vencedor e qual dos jogadores que foi e tambem verifica se ocorreu um empate
@@ -11,7 +11,7 @@ char verificar_vencedor (char matriz[3][3]){
     char vencedor = ' ';
     
     // Verifica linhas e colunas
-    for (i = 0; i < 3; i++) {
+    for (i; i < 3; i++) {
         if ((matriz[i][0] == matriz[i][1] && matriz[i][1] == matriz[i][2])) {
             vencedor = matriz[i][0];
         }
@@ -30,9 +30,11 @@ char verificar_vencedor (char matriz[3][3]){
 
 // Imprimindo o tabuleiro no console
 void imprimir_tabuleiro (char matriz[3][3]){
-    for (int i = 0; i < 3; i++)
+    int i = 0;
+    int j = 0;
+    for (i; i < 3; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (j; j < 3; j++)
         {
             printf("%c", matriz[i][j]);
             if (j != 2)
@@ -121,18 +123,18 @@ int movimento_mouse(int fd, unsigned char data[3], int *coordenadas){
             x = data[1]; // Lê o segundo pack que é responsavel por indicar a movimentação do mouse no eixo X
             y = data[2]; // Lê o terceiro pack que é responsavel por indicar a movimentação do mouse no eixo Y
             //printf("x=%d, y=%d, btn_esqueda=%d, btn_meio=%d, btn_direito=%d\n", x, y, left, middle, right);
-            if (x > 0 && cord_X < 300){
+            if (x > 0 && coordenadas[0] < 300){
                 coordenadas[0] += 1;
             }
-            else if (x < 0 && cord_X > 0){
+            else if (x < 0 && coordenadas[0] > 0){
                 coordenadas[0] -= 1;
             }
 
-            if (y > 0 && cord_Y > 0){
-                coordenadas[1] -= 1;
-            }
-            else if (y < 0 && cord_Y < 300){
+            if (y > 0 && coordenadas[1] < 300){
                 coordenadas[1] += 1;
+            }
+            else if (y < 0 && coordenadas[1] > 0){
+                coordenadas[1] -= 1;
             }
             
             if (left == 1){
@@ -181,7 +183,6 @@ int main()
 
     while (1){
         //Limpando o console anterior e imprimindo o novo tabuleiro junto de algumas informações para os usuarios
-        system("cls");
         imprimir_tabuleiro(tabuleiro);
 
         confirma_jogada = movimento_mouse(fd, data, coordenadas_atuais);
@@ -205,7 +206,7 @@ int main()
             cordenada_y -= 50;
         */  
        
-        if (confirma_jogada){ //Clique do mouse
+        if (confirma_jogada == 1){ //Clique do mouse
             int confirmacao = realizar_jogada(&jogador_atual, quadrante_selecionado, coordenada_da_jogada_matriz, tabuleiro, &rodada);
             printf("Linha %d, Coluna %d", coordenada_da_jogada_matriz[0], coordenada_da_jogada_matriz[1]);
             if (confirmacao == 0){
@@ -216,28 +217,28 @@ int main()
 
             char resultado = verificar_vencedor(tabuleiro);
             if (resultado == 'X'){
-                system("cls");
+                system("clear");
                 imprimir_tabuleiro(tabuleiro);
                 printf("\nJogador 1 foi o vencedor!");
                 resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y);
                 break;
             } else if (resultado == 'O'){
-                system("cls");
+                system("clear");
                 imprimir_tabuleiro(tabuleiro);
                 printf("\nJogador 2 foir o vencedor!");
                 resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y);
                 break;
             } else if (resultado != 'O' && resultado != 'X' && rodada == 9){
-                system("cls");
+                system("clear");
                 imprimir_tabuleiro(tabuleiro);
                 printf("\nO jogo terminou em empate!");
                 resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y);
                 break;
             }
 
-            Sleep(1000);
+            sleep(1);
         }
-        
+        system("clear");
     }
 
     return 0;
