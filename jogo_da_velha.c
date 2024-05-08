@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-//SUBSTITUIR PELA DO LINUX
 #include <unistd.h>
 #include <fcntl.h>
+#include <intelfpgaup/SW.h>
 
 // Verifica se houve um vencedor e qual dos jogadores que foi e tambem verifica se ocorreu um empate
 char verificar_vencedor (char matriz[3][3]){
@@ -42,13 +42,13 @@ void imprimir_tabuleiro (char matriz[3][3]){
                 printf (" | ");
             }
         }
+        j = 0;
         if (i != 2){
             printf("\n---------\n");
         }
     }
     printf("\n\n======================================\n");
 }
-
 // Retorna o quadrante atual que o jogador esta selecionando
 int quadrante_atual(int coordenada_x, int coordenada_y) {
     int tamanho_quadrante = 100; 
@@ -96,11 +96,27 @@ int realizar_jogada(int *jogador_atual, int quadrante, int coordenada_da_jogada[
     return 0;
 }
 
-void resetar_jogo(int *jogador, int *rodada, int *coordenada_x, int *coordenada_y){
-    *jogador = 0;
-    *rodada = 0;
-    *coordenada_x = 0;
-    *coordenada_y = 0;
+    void resetar_jogo(int *jogador, int *rodada, int *coordenada_x, int *coordenada_y, char tabuleiro[3][3]){
+        *jogador = 0;
+        *rodada = 0;
+        *coordenada_x = 0;
+        *coordenada_y = 0;
+        int i = 0;
+        int j = 0;
+        
+        int representate_linha_atual = 0;
+        
+        for (i; i<3; i++){
+            for (j; j<3; j++){
+                if (i == 1)
+                    representate_linha_atual = 3;
+                else if (i == 2)
+                    representate_linha_atual = 6;
+                printf("%c", (char)(representate_linha_atual + j));
+                tabuleiro[i][j] = (representate_linha_atual + j) + '0';
+            }
+            j = 0;
+    }
 }
 
 int movimento_mouse(int fd, unsigned char data[3], int *coordenadas){
@@ -112,7 +128,7 @@ int movimento_mouse(int fd, unsigned char data[3], int *coordenadas){
     int cord_X = 0;
     int cord_Y = 0;
 
-    signed char x, y;
+    
 
         if(bytes > 0)
         {
@@ -130,11 +146,11 @@ int movimento_mouse(int fd, unsigned char data[3], int *coordenadas){
                 coordenadas[0] -= 1;
             }
 
-            if (y > 0 && coordenadas[1] < 300){
-                coordenadas[1] += 1;
-            }
-            else if (y < 0 && coordenadas[1] > 0){
+            if (y > 0 && coordenadas[1] > 0){
                 coordenadas[1] -= 1;
+            }
+            else if (y < 0 && coordenadas[1] < 300){
+                coordenadas[1] += 1;
             }
             
             if (left == 1){
@@ -163,7 +179,6 @@ int main()
     //Variavel responsavel por controlar a vez de cada jogador, se for = 0 significa que o jogador atual é o X e se for = 1 significa que o jogador atual é o O
     int jogador_atual = 0;
     int coordenada_da_jogada_matriz[2] = {0, 0};
-    char comando;
 
     const char *pDevice = "/dev/input/mice";
     int fd = open(pDevice, O_RDWR);
@@ -181,65 +196,95 @@ int main()
 
     int confirma_jogada = 0;
 
-    while (1){
-        //Limpando o console anterior e imprimindo o novo tabuleiro junto de algumas informações para os usuarios
-        imprimir_tabuleiro(tabuleiro);
+    int jogos_ganhos_jogador_1 = 0;
+    int jogos_ganhos_jogador_2 = 0;
 
-        confirma_jogada = movimento_mouse(fd, data, coordenadas_atuais);
+    printf("\nLembresse de como escolher cada uma das opcões:\n");
+    printf("Chave X Inicia novo jogo\n");
+    printf("Chave X sai do jogo\n");
+    SW_open();
+    printf("Ative a chave X para iniciar!\n");
 
-        quadrante_selecionado = quadrante_atual(coordenadas_atuais[0], coordenadas_atuais[1]);
-        printf("\nRodada Atual: %d\n", rodada);
-        
-        printf("O quadrante que o jogador %d esta selecionando e: %d\n", jogador_atual+1, quadrante_selecionado);
-        printf("Se deseja realizar a jogada neste quadrante digite a letra C: ");
+    int valor = 0;
+    int *dados_sw = &valor
 
-        //comando = getchar();
-
-        /*/Será trocado pela logica do mouse
-        if ((comando == 'D' || comando == 'd') && cordenada_x < 300) //Mouse se movendo no eixo X para direita
-            cordenada_x += 50;
-        else if ((comando == 'A' || comando == 'a') && cordenada_x > 0) //Mouse se movendo no eixo X para esquerda
-            cordenada_x -= 50;
-        else if ((comando == 'S' || comando == 's') && cordenada_y < 300) //Mouse se movendo no eixo Y para baixo
-            cordenada_y += 50;
-        else if ((comando == 'W' || comando == 'w') && cordenada_y > 0) //Mouse se movendo no eixo Y para cima
-            cordenada_y -= 50;
-        */  
-       
-        if (confirma_jogada == 1){ //Clique do mouse
-            int confirmacao = realizar_jogada(&jogador_atual, quadrante_selecionado, coordenada_da_jogada_matriz, tabuleiro, &rodada);
-            printf("Linha %d, Coluna %d", coordenada_da_jogada_matriz[0], coordenada_da_jogada_matriz[1]);
-            if (confirmacao == 0){
-                printf("\nO quadrante ja esta ocupado, tente realizar sua jogada em um quadrante vazio!\n");
-            } else {
-                printf("\nJogada realizada com sucesso!\n");
-            }
-
-            char resultado = verificar_vencedor(tabuleiro);
-            if (resultado == 'X'){
-                system("clear");
-                imprimir_tabuleiro(tabuleiro);
-                printf("\nJogador 1 foi o vencedor!");
-                resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y);
-                break;
-            } else if (resultado == 'O'){
-                system("clear");
-                imprimir_tabuleiro(tabuleiro);
-                printf("\nJogador 2 foir o vencedor!");
-                resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y);
-                break;
-            } else if (resultado != 'O' && resultado != 'X' && rodada == 9){
-                system("clear");
-                imprimir_tabuleiro(tabuleiro);
-                printf("\nO jogo terminou em empate!");
-                resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y);
-                break;
-            }
-
-            sleep(1);
+    while(1){
+        SW_read(dados_sw);
+        if (*dados_sw == 1){
+            return 0;
         }
-        system("clear");
     }
+
+    system("clear")
+
+    printf("Iniciando sistema...\n\n");
+
+    sleep(1)
+    
+    while (1){
+
+        SW_read(dados_sw);
+
+        if (*dados_sw == 1){
+
+            // Limpando o console anterior e imprimindo o novo tabuleiro junto de algumas informações para os usuarios
+            imprimir_tabuleiro(tabuleiro);
+
+            quadrante_selecionado = quadrante_atual(coordenadas_atuais[0], coordenadas_atuais[1]);
+            printf("\nRodada Atual: %d\n", rodada);
+            printf("Se deseja realizar a jogada no quadrante atual clique com o botão esquerdo do mouse\n");
+            printf("O quadrante que o jogador %d esta selecionando e: %d\n", jogador_atual + 1, quadrante_selecionado);
+
+            confirma_jogada = movimento_mouse(fd, data, coordenadas_atuais);
+
+            if (confirma_jogada == 1)
+            { // Clique do mouse
+                int confirmacao = realizar_jogada(&jogador_atual, quadrante_selecionado, coordenada_da_jogada_matriz, tabuleiro, &rodada);
+                printf("Linha %d, Coluna %d", coordenada_da_jogada_matriz[0], coordenada_da_jogada_matriz[1]);
+                if (confirmacao == 0)
+                {
+                    printf("\nO quadrante ja esta ocupado, tente realizar sua jogada em um quadrante vazio!\n");
+                }
+                else
+                {
+                    printf("\nJogada realizada com sucesso!\n");
+                }
+
+                char resultado = verificar_vencedor(tabuleiro);
+                if (resultado == 'X')
+                {
+                    system("clear");
+                    imprimir_tabuleiro(tabuleiro);
+                    printf("\nJogador 1 foi o vencedor!\n");
+                    resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y, tabuleiro);
+                    jogos_ganhos_jogador_1 += 1;
+                }
+                else if (resultado == 'O')
+                {
+                    system("clear");
+                    imprimir_tabuleiro(tabuleiro);
+                    printf("\nJogador 2 foir o vencedor!\n");
+                    resetar_jogo(&jogador_atual, &rodada, &coordenada_da_jogada_matriz[0], &coordenada_da_jogada_matriz[1], tabuleiro);
+                    jogos_ganhos_jogador_2 += 1;
+                }
+                else if (resultado != 'O' && resultado != 'X' && rodada == 9)
+                {
+                    system("clear");
+                    imprimir_tabuleiro(tabuleiro);
+                    printf("\nO jogo terminou em empate!\n");
+                    resetar_jogo(&jogador_atual, &rodada, &cordenada_x, &cordenada_y, tabuleiro);
+                }
+
+                sleep(1);
+            }
+        } else if (*dados_sw == 2){
+            system("clear");
+            printf("\n=====Sistema finalizado!=====\n")
+            return 0
+        }
+        
+        
+}
 
     return 0;
 }
