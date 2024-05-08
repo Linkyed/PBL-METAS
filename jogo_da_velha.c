@@ -283,8 +283,7 @@ int main()
             return 0
         }
         
-        
 }
-
+    SW_close();
     return 0;
 }
