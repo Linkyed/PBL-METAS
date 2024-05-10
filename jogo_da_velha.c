@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <intelfpgaup/SW.h>
+#include <stdint.h>
 
 // Verifica se houve um vencedor e qual dos jogadores que foi e tambem verifica se ocorreu um empate
 char verificar_vencedor (char matriz[3][3]){
@@ -119,14 +120,14 @@ int realizar_jogada(int *jogador_atual, int quadrante, int coordenada_da_jogada[
     }
 }
 
-int movimento_mouse(int fd, unsigned char data[3], int *coordenadas){
+int movimento_mouse(int fd, int8_t data[3], int *coordenadas){
     int bytes = read(fd, data, sizeof(data)); // Abre o arquivo MICE para leitura dos eventos de input que o mouse esta enviando
 
     int left = 0 ;
     int middle = 0;
     int right = 0;
-    int cord_X = 0;
-    int cord_Y = 0;
+    int x = 0;
+    int y = 0;
 
     
 
@@ -157,9 +158,8 @@ int movimento_mouse(int fd, unsigned char data[3], int *coordenadas){
                 return 1;
             }
             return 0;
-            //printf("Coordenada X: %d\n", cord_X);
-            //system("clear");
-        }   
+        } 
+    return 0;  
 }
 
 int main()
@@ -182,7 +182,7 @@ int main()
 
     const char *pDevice = "/dev/input/mice";
     int fd = open(pDevice, O_RDWR);
-    unsigned char data[3];
+    int8_t data[3];
 
     if(fd == -1)
     {
@@ -208,6 +208,7 @@ int main()
     int valor = 0;
     int *dados_sw = &valor
 
+    //TESTES TESTES TESTES
     while(1){
         SW_read(dados_sw);
         if (*dados_sw == 1){
@@ -215,11 +216,19 @@ int main()
         }
     }
 
-    system("clear")
+    /* TALVEZ FUNCIONA
+    int8_t valor;
+    while (((valor >> 0) & 1) != 1){
+        SW_read(valor);
+    }
+    
+    */
+
+    system("clear");
 
     printf("Iniciando sistema...\n\n");
 
-    sleep(1)
+    sleep(1);
     
     while (1){
 
@@ -280,7 +289,7 @@ int main()
         } else if (*dados_sw == 2){
             system("clear");
             printf("\n=====Sistema finalizado!=====\n")
-            return 0
+            return 0;
         }
         
 }
