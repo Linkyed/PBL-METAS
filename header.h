@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #define LEFT 0
 #define RIGHT 4
 #define UP 2
