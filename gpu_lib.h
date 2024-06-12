@@ -43,6 +43,21 @@ int data_register, ativo;
 int set_sprite( int registrador, int x, int y, int offset, int activation_bit);
 
 /**
+ * @brief Usada para setar um sprite na tela
+ * 
+ * @param address      
+ * @param ref_x                
+ * @param ref_y                
+ * @param size           
+ * @param r   
+ * @param g   
+ * @param b   
+ * @param shape   
+ * @return                 0 quando a operação não foi realizada, e 1 quando foi bem sucedida
+*/
+int set_poligono( int address, int ref_x, int ref_y, int size, int r, int g, int b, int shape);
+
+/**
  * @brief Usada para modelar o background atraves do preenchimento dos blocos de 8x8 pixels
  * 
  * @param column    Valor da coluna do bloco.
@@ -62,7 +77,7 @@ int set_background_block( int column, int line, int R, int G, int B);
  * @param B   Valor para a cor azul.
  * @return    0 quando a operação não foi realizada, e 1 quando foi bem sucedida
 */
-int set_background_color(int R, int G, int B);
+int set_background_color(int R, int G, int B, int fd);
 
 /**
  * @brief Usada para atualizar as coordenadas x e y de um sprit móvel de acordo ao seu ângulo de movimento e valor de deslocamento.
