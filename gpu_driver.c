@@ -7,10 +7,10 @@
 #include <linux/device.h>
 #include <linux/cdev.h>
 
-#define WBR 0x00
-#define WBM 0x01
-#define WSM 0x02
-#define DP  0x03
+#define WBR 0b00
+#define WBM 0b10
+#define WSM 0b01
+#define DP  0b11
 #define DATA_A  0x80
 #define DATA_B  0x70
 #define START 0xc0
