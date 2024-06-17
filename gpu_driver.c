@@ -123,24 +123,54 @@ static ssize_t device_write(struct file *filep, const char *buffer, size_t len, 
     }
 
     switch (command[0]) {
-        case 0:
-            instrucao_wbr(command[1], command[2], command[3]);
+        case 0:  {
+            int r = command[1];
+            int g = command[2];
+            int b = command[3];
+            instrucao_wbr(r, g, b);
             break;
-        case 1:
-            instrucao_wbr_sprite(command[1], command[2], command[3], command[4], command[5]);
+        }
+        case 1: {
+            int reg = command[1];
+            int offset = ((command[2] << 1) & 0x1FE) | ((command[3] >> 7) & 0x01); // 9-bit offset
+            int x = ((command[3] << 3) & 0x3F8) | ((command[4] >> 5) & 0x07);     // 10-bit x
+            int y = ((command[4] << 5) & 0x3E0) | ((command[5] >> 3) & 0x1F);     // 10-bit y
+            int sp = command[6];
+            instrucao_wbr_sprite(reg, offset, x, y, sp);
             break;
-        case 2:
-            instrucao_wbm(command[1], command[2], command[3], command[4]);
+        }
+        case 2: {
+            int address = ((command[1] << 4) | (command[2] >> 4)); // 12-bit address
+            int r = command[2];
+            int g = command[3];
+            int b = command[4];
+            instrucao_wbm(address, r, g, b);
             break;
-        case 3:
-            instrucao_wsm(command[1], command[2], command[3], command[4]);
+        }
+        case 3: {
+            int address = (command[1] << 6) | (command[2]); // 14-bit address
+            int r = command[3];
+            int g = command[4];
+            int b = command[5];
+            instrucao_wsm(address, r, g, b);
             break;
-        case 4:
-            instrucao_dp(command[1], command[2], command[3], command[4], command[5], command[6], command[7], command[8]);
+        }
+        case 4: {
+            int address = command[1];
+            int ref_x = ((command[2] << 1) | command[3] >> 7);
+            int ref_y = (((command[3] & 0b1111111) << 2) | command[4] >> 6);
+            int size = command[4] & 0b1111;
+            int r = command[5] >> 5;
+            int g = (command[5] >> 2) & 0b111;
+            int b =  command[6] >> 5;
+            int shape =  command[6] & 0b1;
+            instrucao_dp(address, ref_x, ref_y, size, r, g, b, shape);
             break;
-        default:
+        }
+        default: {
             printk(KERN_ALERT "Comando desconhecido\n");
             return -EINVAL;
+        }
     }
 
     return len;

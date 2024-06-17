@@ -1,261 +1,155 @@
-#include <fcntl.h>
-#include <unistd.h>
+/******************************************************************************
+
+                            Online C Compiler.
+                Code, Compile, Run and Debug C program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
 #include <stdio.h>
+#include <stdint.h>
 
-#define LEFT 0
-#define RIGHT 4
-#define UP 2
-#define DOWN 6
-#define UPPER_RIGHT 1
-#define UPPER_LEFT 3
-#define BOTTOM_LEFT 5
-#define BOTTOM_RIGHT 7
 
-#define DEVICE_PATH "/dev/gpu_driver"
-
-typedef struct Sprite {
-    int pos_X;
-    int pos_Y;
-    int direction;
-    int offset;
-    int register_val; 
-    int mov_X;
-    int mov_Y;
-    int enable;
-    int collision;
-};
-
-typedef struct Sprite_Fixed {
- int pos_x;
- int pos_Y;
- int offset;
- int register_val;
- int enable;
- };
-
-typedef struct Poligono {
-    int ref_X;
-    int ref_Y;
-    int address;
-    int register_val; 
-    int size;
-    int R;
-    int G;
-    int B;
-    int shape;
-};
-
-int set_background_color (int R, int G, int B) {
-    int fd = open(DEVICE_PATH, O_WRONLY);
-
-    if (fd < 0) {
-        perror("Failed to open the device");
-        return -1;
-    }
-
-    unsigned char command[9] = {0};
-    int reg = 0b00000; // Register number (5 bits)
-    //int r = 0b111;     // Red color value (3 bits)
-    //int g = 0b000;     // Green color value (3 bits)
-    //int b = 0b000;     // Blue color value (3 bits)
-
-    // Construct the command
-    command[0] = 0; // Reserved for future use
-    command[1] = B;
-    command[2] = G;
-    command[3] = R;
-    
-    // Write the command to the device
-    if (write(fd, command, sizeof(command)) < 0) {
-        perror("Failed to write to the device");
-        close(fd);
-        return 0;
-    }
-
-    printf("Command sent to device: register=%d, r=%d, g=%d, b=%d\n", reg, R, G, B);
-
-    close(fd);
-
-    return 1;
-
+void instrucao_wbr_sprite (int reg, int offset, int x, int y, int sp) {
+    printf("reg: %d, offset: %d, x: %d, y: %d, sp: %d\n", reg, offset, x, y, sp);
 }
 
-int set_sprite(int registrador, int x, int y, int offset, int sp) {
-    int fd = open(DEVICE_PATH, O_WRONLY);
-
-    if (fd < 0) {
-        perror("Failed to open the device");
-        return -1;
-    }
-
-    unsigned char command[9] = {0};
-
-    // Construct the command
-    command[0] = 1; // Reserved for future use
-    command[1] = registrador;
-    command[2] = offset;
-    command[3] = x;
-    command[4] = y;
-    command[5] = sp;
-    
-    // Write the command to the device
-    if (write(fd, command, sizeof(command)) < 0) {
-        perror("Failed to write to the device");
-        close(fd);
-        return 0;
-    }
-
-    printf("Command sent to device: register=%d, offset=%d, x=%d, y=%d\n", registrador, offset, x, y);
-
-    close(fd);
-    return 1;
+void instrucao_wbm (int address, int r, int g, int b) {
+    printf("address: %d, r: %d, g: %d, b: %d\n", address, r, g, b);
 }
 
-int set_background_block(int address, int R, int G, int B) {
-    int fd = open(DEVICE_PATH, O_WRONLY);
-
-    if (fd < 0) {
-        perror("Failed to open the device");
-        return -1;
-    }
-
-    unsigned char command[9] = {0};
-
-    // Construct the command
-    command[0] = 2; // Reserved for future use
-    command[1] = address;
-    command[2] = R;
-    command[3] = G;
-    command[4] = B;
-    
-    // Write the command to the device
-    if (write(fd, command, sizeof(command)) < 0) {
-        perror("Failed to write to the device");
-        close(fd);
-        return 0;
-    }
-    
-    printf("Command sent to device: addres=%d, R=%d, G=%d, B=%d\n", address, R, G, B);
-
-    close(fd);
-    return 1;
+void instrucao_wsm (int address, int r, int g, int b) {
+    printf("address: %d, r: %d, g: %d, b: %d\n", address, r, g, b);
 }
 
-int set_poligono(int address, int ref_x, int ref_y, int size, int r, int g, int b, int shape) {
+void instrucao_dp(int address, int ref_x, int ref_y, int size, int r, int g, int b, int shape) {
+    printf("address: %d, refx: %d, refy: %d, size: %d, r: %d, g: %d, b: %d, shape: %d\n", address, ref_x, ref_y, size, r, g, b, shape);
+}
 
-    int fd = open(DEVICE_PATH, O_WRONLY);
-
-    if (fd < 0) {
-        perror("Failed to open the device");
-        return -1;
+void send(unsigned char *command) {
+    switch (command[0]) {
+        case 0:  {
+            int R = command[1];
+            int G = command[2];
+            int B = command[3];
+            break;
+        }
+        case 1: {
+            int reg = command[1];
+            int offset = ((command[2] << 1) & 0x1FE) | ((command[3] >> 7) & 0x01); // 9-bit offset
+            int x = ((command[3] << 3) & 0x3F8) | ((command[4] >> 5) & 0x07);     // 10-bit x
+            int y = ((command[4] << 5) & 0x3E0) | ((command[5] >> 3) & 0x1F);     // 10-bit y
+            int sp = command[6];
+            instrucao_wbr_sprite(reg, offset, x, y, sp);
+            break;
+        }
+        case 2: {
+            int address = ((command[1] << 4) | (command[2] >> 4)); // 12-bit address
+            int r = command[2] & 0x0F;
+            int g = command[3];
+            int b = command[4];
+            instrucao_wbm(address, r, g, b);
+            break;
+        }
+        case 3: {
+            int address = (command[1] << 6) | (command[2]); // 14-bit address
+            int r = command[3] & 0x07;
+            int g = command[4];
+            int b = command[5];
+            instrucao_wsm(address, r, g, b);
+            break;
+        }
+        case 4: {
+            int address = command[1];
+            int ref_x = ((command[2] << 1) | command[3] >> 7);
+            int ref_y = (((command[3] & 0b1111111) << 2) | command[4] >> 6);
+            int size = command[4] & 0b1111;
+            int r = command[5] >> 5;
+            int g = (command[5] >> 2) & 0b111;
+            int b =  command[6] >> 5;
+            int shape =  command[6] & 0b1;
+            instrucao_dp(address, ref_x, ref_y, size, r, g, b, shape);
+            break;
+        }
+        default: {
+            
+        }
     }
-
-    unsigned char command[9] = {0};
-
-    // Construct the command
-    command[0] = 4;  // DP
-    command[1] = address;
-    command[2] = ref_x;
-    command[3] = ref_y;
-    command[4] = size;
-    command[5] = r;
-    command[6] = g;
-    command[7] = b;
-    command[8] = shape;
-    
-    // Write the command to the device
-    if (write(fd, command, sizeof(command)) < 0) {
-        perror("Failed to write to the device");
-        close(fd);
-        return 0;
-    }
-    printf("Command sent to device: address=%d, ref_x=%d, ref_y=%d, size=%d, r=%d g=%d b=%d shape=%d\n", address, ref_x, ref_y, size,r,g,b,shape );
-    close(fd);
-    return 1;
-}
-
-struct Sprite_Fixed create_fixed_sprite(int pos_x, int pos_Y, int offset, int register_val, int enable) {
-    struct Sprite_Fixed new_fixed_sprite;
-
-    new_fixed_sprite.pos_x = pos_x;
-    new_fixed_sprite.pos_Y = pos_Y;
-    new_fixed_sprite.offset = offset;
-    new_fixed_sprite.register_val = register_val;
-    new_fixed_sprite.enable = enable;
-
-    set_sprite(new_fixed_sprite.register_val, new_fixed_sprite.pos_x, new_fixed_sprite.pos_Y, new_fixed_sprite.offset, new_fixed_sprite.enable);
-
-    return newSpriteFixed;
-}
-
-struct Poligono create_poligono(int ref_X, int ref_Y, int address, int size, int R, int G, int B, int shape) {
-    struct Poligono new_poligono;
-
-    new_poligono.ref_X = ref_X;
-    new_poligono.ref_Y = ref_Y;
-    new_poligono.address = address;
-    new_poligono.size = size;
-    new_poligono.R = R;
-    new_poligono.G = G;
-    new_poligono.B = B;
-    new_poligono.shape = shape;
-
-    set_poligono(new_poligono.address, new_poligono.ref_X, new_poligono.ref_Y, new_poligono.size, new_poligono.R, new_poligono.G, new_poligono.B, new_poligono.shape)
-
-    return new_poligono;
-}
-
-struct Sprite create_moving_sprite(int pos_X, int pos_Y, int direction, int offset, int register_val, 
-                           int mov_x, int mov_y, int enable, int collision) {
-
-    struct Sprite new_sprite;
-    new_sprite.pos_X = pos_X;
-    
-    new_sprite.pos_Y = pos_Y;
-    new_sprite.direction = direction;
-    new_sprite.offset = offset;
-    new_sprite.register_val = register_val;
-    new_sprite.mov_X = mov_x;
-    new_sprite.mov_Y = mov_y;
-    new_sprite.enable = enable;
-    new_sprite.collision = collision;
-    
-
-    set_sprite(new_sprite.register_val, new_sprite.pos_X, new_sprite.pos_Y, new_sprite.offset, new_sprite.enable);
-
-    return new_sprite;
-}
-
-int move_sprite (Sprite *sp, int mirror, int move_direction) {
-    if (move_direction == LEFT){
-        sp.pos_X -= sp.mov_X;
-    } else if (move_direction == RIGHT){
-        sp.pos_X += sp.mov_X;
-    } else if (move_direction == UP){
-        sp.pos_Y -= sp.mov_Y;
-    } else if (move_direction == DOWN){
-        sp.pos_Y += sp.mov_Y;
-    } else if (move_direction == UPPER_RIGHT){
-        sp.pos_Y -= sp.mov_Y;
-        sp.pos_X += sp.mov_X;
-    } else if (move_direction == UPPER_LEFT){
-        sp.pos_Y -= sp.mov_Y;
-        sp.pos_X -= sp.mov_X;
-    } else if (move_direction == BOTTOM_LEFT){
-        sp.pos_Y += sp.mov_Y;
-        sp.pos_X -= sp.mov_X;
-    } else if (move_direction == BOTTOM_LEFT){
-        sp.pos_Y += sp.mov_Y;
-        sp.pos_X += sp.mov_X;
-    }
-
-    set_sprite(sp.register_val, sp.pos_X, sp.pos_Y, sp.offset, sp.enable);
 }
 
 
-int main () {
-    
-  
-   
+
+void send_instrucao_wbr_sprite(int reg, int offset, int x, int y, int sp) {
+    unsigned char command[7];
+
+    command[0] = 1; // Command for instrucao_wbr_sprite
+    command[1] = reg;
+    command[2] = (offset >> 1) & 0xFF;
+    command[3] = ((offset & 0x01) << 7) | ((x >> 3) & 0x7F);
+    command[4] = ((x & 0x07) << 5) | ((y >> 5) & 0x1F);
+    command[5] = (y & 0x1F) << 3;
+    command[6] = sp;
+
+    send (command);
+
+}
+
+void send_instrucao_wbm(int address, int r, int g, int b) {
+    unsigned char command[5];
+    //  1111 1111 1111
+    command[0] = 2; // Command for instrucao_wsm
+    command[1] = (address >> 4); // Higher 8 bits of 14-bit address
+    command[2] = ((address) << 4) | (r & 0b0111); // Lower 6 bits of address and 3-bit r
+    command[3] = g & 0xFF; // g value
+    command[4] = b & 0xFF; // b value
+    send (command);
+}
+
+
+void send_instrucao_wsm(int address, int r, int g, int b) {
+    unsigned char command[6];
+    // 0011 1111 1111 1111
+    command[0] = 3; // Command for instrucao_wsm
+    command[1] = (address >> 6); // Higher 8 bits of 14-bit address
+    command[2] = (address & 0b111111); // Lower 6 bits of address and r
+    command[3] = r & 0b111;
+    command[4] = g & 0b111; // g value
+    command[5] = b & 0b111; // b value
+
+    send(command);
+}
+
+void send_instrucao_dp(int address, int ref_x, int ref_y, int size, int r, int g, int b, int shape) {
+    unsigned char command[7];
+    // 0001 1111 1111
+    // 0100 0000 0000
+    command[0] = 4; // Command for instrucao_wsm
+    command[1] = address; // Higher 8 bits of 14-bit address
+    command[2] = ref_x >> 1; // Lower 6 bits of address and r
+    command[3] = ((ref_x & 0b01) << 7) | (ref_y >> 2); // Lower 6 bits of address and r
+    command[4] = ((ref_y & 0b11) << 6) | (size & 0b1111);
+    command[5] = ((r & 0b111)<< 5) | (g & 0b111) << 2; // b value
+    command[6] = ((b &0b111) << 5) | shape & 0b1;
+    //printf("asd: %d, %d, %d\n", command[2], (command[3] >> 7), ((command[2] << 1) | command[3] >> 7));
+    //printf("asd: %d, %d, %d", (command[3] & 0b1111111), (command[4] >> 6), (((command[3] & 0b1111111) << 2) | command[4] >> 6));
+
+    send(command);
+}
+
+int main() {
+
+    // Example values
+    int reg = 2;
+    int offset = 1; // Example offset value (9 bits)
+    int x = 1;      // Example x value (10 bits)
+    int y = 1;      // Example y value (10 bits)
+    int sp = 1;       // Example sp value
+
+    send_instrucao_wbr_sprite(1, reg, offset, x, y, sp);
+    send_instrucao_wbm(4096, 7, 7, 7);
+    send_instrucao_wsm(16384, 7, 7, 7);
+    send_instrucao_dp(1, 511, 511, 15, 7, 7, 7, 1);
+
+
     return 0;
 }

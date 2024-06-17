@@ -7,18 +7,20 @@
 #define BOTTOM_LEFT 5
 #define BOTTOM_RIGHT 7
 
+#define DEVICE_PATH "/dev/gpu_driver"
+
 /**
  * @brief Struct usada para sprits moveis.
  */
 typedef struct{
-int coord_x; /*Armazena a coordenada X do sprite. */
-int coord_y; /*Armazena a coordenada Y do sprite. */
+int pos_X; /*Armazena a coordenada X do sprite. */
+int pos_Y; /*Armazena a coordenada Y do sprite. */
 int direction; /*Armazena um numero inteiro indicando o ́angulo de movimento. */
 int offset; /*Indica o offset de memoria ́utilizado para a escolha do bitmap armazenado no Processa-dor Grafico. */
 int data_register; /*Indica o registrador do Banco de Registradores no qual as informaçoes do ̃sprite serao armazenadas. */
-int step_x; /*Armazena o numero de pixels que o sprite ira se deslocar no eixo X quando o comando de movimentação for utilizado. */
-int step_y; /*Armazena o numero de pixels que o sprite ira se deslocar no eixo Y quando o comando de movimentação for utilizado. */
-int ativo; /*Habilita/Desabilita a impressao do ̃sprite em um determinado momento. */
+int step_X; /*Armazena o numero de pixels que o sprite ira se deslocar no eixo X quando o comando de movimentação for utilizado. */
+int step_Y; /*Armazena o numero de pixels que o sprite ira se deslocar no eixo Y quando o comando de movimentação for utilizado. */
+int enable; /*Habilita/Desabilita a impressao do ̃sprite em um determinado momento. */
 int collision; /*Informa se o sprite sofreu alguma colisao. */
 } Sprite; 
 
@@ -33,14 +35,14 @@ int data_register, ativo;
 /**
  * @brief Usada para setar um sprite na tela
  * 
- * @param registrador      
+ * @param reg      
  * @param x                Coordenada x do sprite na tela
  * @param y                Coordenada y do sprite na tela
  * @param offset           Deslocamento na memória para selecionar o bitmap
- * @param activation_bit   Ativação do sprite (0 - desativado, 1 - ativado)
+ * @param sp   Ativação do sprite (0 - desativado, 1 - ativado)
  * @return                 0 quando a operação não foi realizada, e 1 quando foi bem sucedida
 */
-int set_sprite( int registrador, int x, int y, int offset, int activation_bit);
+int set_sprite( int reg, int x, int y, int offset, int sp);
 
 /**
  * @brief Usada para setar um sprite na tela
@@ -77,7 +79,7 @@ int set_background_block( int column, int line, int R, int G, int B);
  * @param B   Valor para a cor azul.
  * @return    0 quando a operação não foi realizada, e 1 quando foi bem sucedida
 */
-int set_background_color(int R, int G, int B, int fd);
+int set_background_color(int R, int G, int B);
 
 /**
  * @brief Usada para atualizar as coordenadas x e y de um sprit móvel de acordo ao seu ângulo de movimento e valor de deslocamento.
@@ -96,3 +98,11 @@ void increase_coordinate(Sprite *sp, int mirror);
  * @return      1 quando colisão foi detectada e 0 quando não.
 */
 int collision(Sprite *sp1, Sprite *sp2);
+
+int set_sprite_pixel_color( int address, int R, int G, int B);
+
+int open_gpu_device ();
+
+int close__gpu_devide ();
+
+void teste () ;

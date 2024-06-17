@@ -1,0 +1,1 @@
+FUNCIONA gcc -o main main.c gpu_lib.c
