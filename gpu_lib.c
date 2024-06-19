@@ -1,11 +1,3 @@
-/******************************************************************************
-
-                            Online C Compiler.
-                Code, Compile, Run and Debug C program online.
-Write your code in this editor and press "Run" button to compile and execute it.
-
-*******************************************************************************/
-
 #include <stdio.h>
 #include <fcntl.h>
 //DO LINUX
@@ -86,20 +78,20 @@ int set_poligono( int address, int ref_x, int ref_y, int size, int r, int g, int
 
 int set_background_block( int column, int line, int R, int G, int B){
     unsigned char command[5];
-
+    // 0001 1111 1111 1111 000
     int i = 0;
-    int address = 0;
-    for (i; i< line; i++){
-        address += 80;
-    }
+    int address = column + (line*80);
 
-    address += column;
 
-    command[0] = 2; 
-    command[1] = (address >> 4); 
-    command[2] = ((address) << 4) | (R & 0b0111); 
-    command[3] = G & 0xFF; 
-    command[4] = B & 0xFF; 
+    command[0] = 2;
+    command[1] = (address >> 5);
+    command[2] = ((address) << 3) | R;
+    command[3] = G;
+    command[4] = B;
+
+    //printf("address[1]: %d\n", (R & 0b111));
+    printf("green: %d\n", command[3]);
+    
 
     if (write(fd, command, sizeof(command)) < 0) {
         perror("Failed to write to the device");
@@ -108,6 +100,26 @@ int set_background_block( int column, int line, int R, int G, int B){
 
     return 1;
 }
+
+int set_background_block_address(int address, int R, int G, int B) {
+   
+    unsigned char command[5];
+    command[0] = 2; // Reserved for future use
+    command[1] = address;
+    command[2] = R;
+    command[3] = G;
+    command[4] = B;
+    
+    // Write the command to the device
+    if (write(fd, command, sizeof(command)) < 0) {
+        perror("Failed to write to the device");
+        close(fd);
+        return 0;
+    }
+    return 1;
+}
+
+
 
 int set_sprite_pixel_color( int address, int R, int G, int B){
     unsigned char command[6];
@@ -172,6 +184,32 @@ int collision(Sprite *sp1, Sprite *sp2){
 
 }
 
-void teste () {
-    printf("oi");
+
+void clear_screen() {
+    int i = 0;
+    int j = 0;
+    for (i; i <60; i++){
+        for (j; j < 80; j++){
+            set_background_block(j, i, 6, 7, 7);
+        }
+        j = 0;
+    }
+}
+
+void fill_background_blocks (int line) {
+    int i = line;
+    int j = 0;
+    for (i; i <60; i++){
+        for (j; j < 80; j++){
+            set_background_block(j, i, 2, 5, 0);
+        }
+        j = 0;
+    }
+}
+
+void clear_poligonos(){
+    int i = 0;
+    for (i; i < 15; i++){
+        set_poligono(i, 0, 0, 0, 0, 0, 0, 0);
+    }
 }

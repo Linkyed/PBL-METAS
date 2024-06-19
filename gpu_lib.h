@@ -1,3 +1,4 @@
+
 #define LEFT 0
 #define RIGHT 4
 #define UP 2
@@ -105,4 +106,10 @@ int open_gpu_device ();
 
 int close__gpu_devide ();
 
+void clear_screen();
+
+void clear_poligonos();
+
 void teste () ;
+
+void fill_background_blocks (int line);
