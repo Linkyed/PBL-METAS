@@ -12,29 +12,27 @@ def return_pixel_codes(image, start):
         for pixel in line:
             start += 1
             if (pixel > 254):
-                lista.append(f"set_sprite_pixel_color({start}, 7, 0, 0);")
+                lista.append(f"set_sprite_pixel_color({start}, 7, 7, 7);")
+            elif (pixel < 254 and pixel > 60):
+                lista.append(f"set_sprite_pixel_color({start}, 3, 3, 3);")
+            else:
+                lista.append(f"set_sprite_pixel_color({start}, 0, 0, 0);")
+
+
     return lista
 
 # Step 1: Read the image
-anf_img = Image.open('anfr.png').convert('L')  # Convert image to monochromatic (grayscale)
-rans_img = Image.open('rans.png').convert('L')  # Convert image to monochromatic (grayscale)
-erai_img = Image.open('erai.png').convert('L')  # Convert image to monochromatic (grayscale)
+img = Image.open('seta_mouse.png').convert('L')  # Convert image to monochromatic (grayscale)
 
 # Step 2: Convert the image to a numpy array
-anf = np.array(anf_img)
-rans = np.array(rans_img)
-erai = np.array(erai_img)
+img_array = np.array(img)
 #print(image_array)
 
 
 start = 10000
-lista_anf = return_pixel_codes(anf, 10000)
-lista_rans = return_pixel_codes(rans, 10400)
-lista_erai = return_pixel_codes(erai, 10800)
+lista = return_pixel_codes(img_array, 10000)
 
-write_strings_to_file(lista_anf, 'anf_codes')
-write_strings_to_file(lista_rans, 'rans_codes')
-write_strings_to_file(lista_erai, 'erai_codes')
+write_strings_to_file(lista, 'seta_mouse_codes')
 
 # Step 3: Convert the numpy array back to an image
 #reduced_gray_image_128 = Image.fromarray(reduced_gray_array_128)

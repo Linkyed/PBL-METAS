@@ -1,11 +1,10 @@
-
 /**
- * \file            main.c
- * \brief           Programa que quando compilado será executado para formar um desenho no monitor usando a GPU
+ * \file            limpar.c
+ * \brief           Arquivo que pode ser executado para limpar todos os elementos da tela
  */
 
 /*
- * Copyright (c) year FirstName LASTNAME
+ * Copyright (c) 2024 Pedro Henrique Araujo Almeida, Demerval, Matheus
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,33 +28,24 @@
  *
  * This file is part of library_name.
  *
- * Author:          FirstName LASTNAME <optional_email@example.com>
+ * Author:          Pedro Henrique ARAUJO ALMEIDA <phaalmeida1\gmail.com>
+ *                  Demerval <optional_email\example.com>
+ *                  Matheus <optional_email\example.com>
  */
 
 #include <stdio.h>
-#include <unistd.h>
-#include <stdint.h>
 #include "gpu_lib.h"
-#include "mouse_move.h"
 
 int main()
 {   
-    /* Tentar abrir o arquivo do kernel do driver da GPU */
+	/* Tentar abrir o arquivo do kernel do driver da GPU */
     if (open_gpu_device() == 0)
         return 0;
 
-    set_background_color(0, 0, 0); /* Coloca a cor do background como preto */
-    draw_mouse();
-    set_sprite(1, 0, 0, 25, 1);
-    while (1) {
-        mouse_movement();
-        set_sprite(1, pos_x, pos_y, 25, 1);
-        if (left == 1) {
-            break;
-        }
-    }
+	set_background_color(0, 0, 0); /* Retorna o background para a cor preta */
+    clear_background_blocks(); /* Limpa todos os background blocks */
+	clear_poligonos(); /* Limpa todo os poligono */
+	clear_sprites(); /* Limpa todos os sprites */
 
-    close_gpu_devide(); /* Fecha o arquivo do driver da GPU */
-
-    return 0;
+	close_gpu_devide(); /* Fecha o arquivo do driver da GPU */
 }
