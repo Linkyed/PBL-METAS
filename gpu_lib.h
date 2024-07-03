@@ -78,7 +78,10 @@ uint16_t data_register;                              /*!< Indica o registrador d
 uint16_t enable;                                     /*!< Habilita/Desabilita a impressao do ̃sprite em um determinado momento. */
 } Sprite_Fixed;
 
-uint8_t set_sprite( uint8_t reg, uint16_t x, uint16_t y, uint8_t offset, uint8_t sp);
+extern Sprite_Fixed fixed_sprites_array[5];
+extern Sprite sprites_array[5];
+
+uint8_t set_sprite(uint8_t reg, uint16_t x, uint16_t y, uint8_t offset, uint8_t sp);
 
 uint8_t set_poligono( uint16_t address, uint16_t ref_x, uint16_t ref_y, uint8_t size, uint8_t r, uint8_t g, uint8_t b, uint8_t shape);
 
@@ -92,6 +95,10 @@ uint8_t set_sprite_pixel_color( uint16_t address, uint8_t R, uint8_t G, uint8_t 
 
 uint8_t open_gpu_device ();
 
+uint8_t create_fixed_sprite(uint8_t array_position, uint8_t reg, uint16_t x, uint16_t y, uint8_t offset, uint8_t sp );
+
+uint8_t create_sprite(uint8_t array_position, uint8_t reg, uint16_t x, uint16_t y, uint8_t offset, uint8_t sp );
+
 void close_gpu_devide ();
 
 void increase_coordinate(Sprite *sp, uint8_t mirror);
@@ -100,7 +107,7 @@ void clear_background_blocks();
 
 void clear_poligonos();
 
-void fill_background_blocks (uint8_t line);
+void fill_background_blocks (uint8_t line,  uint8_t R, uint8_t G, uint8_t B);
 
 void clear_sprites();
 

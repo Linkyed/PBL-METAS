@@ -315,7 +315,7 @@ void clear_background_blocks()
  * \brief           Usada para a partir de uma determinada linha, preencher todos os background blocks que estão na linha e todos os abaixo da linha
  * \param[in]       line: Valor da linha da tela 60x80
  */
-void fill_background_blocks(uint8_t line)
+void fill_background_blocks(uint8_t line, uint8_t R, uint8_t G, uint8_t B)
 {
     int i = line;
     int j = 0;
@@ -323,10 +323,38 @@ void fill_background_blocks(uint8_t line)
     {
         for (j; j < 80; j++)
         {
-            set_background_block(j, i, 2, 5, 0);
+            set_background_block(j, i, R, G, B);
         }
         j = 0;
     }
+}
+
+uint8_t create_fixed_sprite(uint8_t array_position, uint8_t reg, uint16_t x, uint16_t y, uint8_t offset, uint8_t sp ) {
+    fixed_sprites_array[array_position].data_register = reg;
+    fixed_sprites_array[array_position].coord_x = x;
+    fixed_sprites_array[array_position].coord_y = y;
+    fixed_sprites_array[array_position].enable = sp;
+    fixed_sprites_array[array_position].offset = offset;
+
+    int ok = set_sprite(reg, x, y, offset, sp);
+    return ok;
+
+}
+
+uint8_t create_sprite(uint8_t array_position, uint8_t reg, uint16_t x, uint16_t y, uint8_t offset, uint8_t sp ) {
+    sprites_array[array_position].data_register = reg;
+    sprites_array[array_position].pos_x = x;
+    sprites_array[array_position].pos_y = y;
+    sprites_array[array_position].enable = sp;
+    sprites_array[array_position].offset = offset;
+    sprites_array[array_position].step_x = 1;
+    sprites_array[array_position].step_y = 1;
+    sprites_array[array_position].direction = 0;
+    sprites_array[array_position].collision = 0;
+
+    int ok = set_sprite(reg, x, y, offset, sp);
+    return ok;
+    
 }
 
 /**
