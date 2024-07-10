@@ -167,9 +167,9 @@ static ssize_t device_write(struct file *filep, const char *buffer, size_t len, 
     /* Loop para quando a fila esta cheia o driver dar uma pequena pausa para esperar a fila liberar*/
     while (buffer_gpu){
         buffer_gpu = ioread32(WRFULL_PTR);
-        if (buffer_gpu == 0){
+        /*if (buffer_gpu == 0){
             msleep(130);
-        }
+        }*/
     };
     
     /* Verifica se o commando recebido esta nos padrões aceitaveis pelo kernel */
@@ -298,4 +298,3 @@ static void __exit my_module_exit(void) {
 
 module_init(my_module_init);
 module_exit(my_module_exit);
-

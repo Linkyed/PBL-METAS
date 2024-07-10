@@ -11,34 +11,43 @@ def return_pixel_codes(image, start):
     for line in image:
         for pixel in line:
             start += 1
-            if (pixel > 254):
-                lista.append(f"set_sprite_pixel_color({start}, 7, 7, 7);")
-            elif (pixel < 254 and pixel > 60):
-                lista.append(f"set_sprite_pixel_color({start}, 3, 3, 3);")
+            if (pixel[3] == 0):
+                lista.append(f"set_sprite_pixel_color({start}, 6, 7, 7);")
             else:
-                lista.append(f"set_sprite_pixel_color({start}, 0, 0, 0);")
-
-
+                red = pixel[0] // 32
+                green = pixel[1] // 32
+                blue = pixel[1] // 32
+                lista.append(f"set_sprite_pixel_color({start}, {red}, {green}, {blue});")
     return lista
 
-# Step 1: Read the image
-img = Image.open('seta_mouse.png').convert('L')  # Convert image to monochromatic (grayscale)
 
-# Step 2: Convert the image to a numpy array
-img_array = np.array(img)
-#print(image_array)
+def return_bg_blocks_codes(image):
+    lista = []
+    line_num = 0
+    for line in image:
+        column_num = 0
+        for column in line:
+            if (column[3] == 0):
+                lista.append(f"set_background_block({column_num}, {line_num}, 6, 7, 7);")
+            else:
+                red = column[0] // 32
+                green = column[1] // 32
+                blue = column[1] // 32
+                lista.append(f"set_background_block({column_num}, {line_num}, {red}, {green}, {blue});")
+            column_num += 1
+        line_num += 1
+    return lista
+
+img_sprite = Image.open('imgs/bomba.png')  # Convert image to monochromatic (grayscale)
+img_bg_blocks = Image.open('imgs/pause_screen.png')
+
+img_array_sprite = np.array(img_sprite)
+img_array_bg_blocks = np.array(img_bg_blocks)
 
 
-start = 10000
-lista = return_pixel_codes(img_array, 10000)
+start = 400
+lista_sprite = return_pixel_codes(img_array_sprite, start)
+lista_bg_blocks = return_bg_blocks_codes(img_array_bg_blocks)
 
-write_strings_to_file(lista, 'seta_mouse_codes')
+write_strings_to_file(lista_sprite, 'imgs/codes_txt/bomba_sprite')
 
-# Step 3: Convert the numpy array back to an image
-#reduced_gray_image_128 = Image.fromarray(reduced_gray_array_128)
-
-
-# Step 4: Save or display the image
-#teste_image = Image.fromarray(novo_image)  # Save the image
-#teste_image.show()
-#teste_image.save("te.png")

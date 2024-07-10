@@ -226,45 +226,11 @@ int set_sprite_pixel_color(uint16_t address, uint8_t R, uint8_t G, uint8_t B)
  * \param[in]       sp: Ponteiro do sprite que deve ter suas coordenadas atualizadas
  * \param[in]       mirror: Define se as coordendas do sprite enviado devem ser espelhadas
  */
-void increase_coordinate(Sprite *sp, uint8_t mirror)
+void change_coordinate(Sprite *sp, uint16_t new_x, uint16_t new_y, uint8_t mirror)
 {
-    if ((*sp).direction == LEFT)
-    {
-        (*sp).pos_x -= (*sp).step_x;
-    }
-    else if ((*sp).direction == RIGHT)
-    {
-        (*sp).pos_x += (*sp).step_x;
-    }
-    else if ((*sp).direction == UP)
-    {
-        (*sp).pos_y -= (*sp).step_y;
-    }
-    else if ((*sp).direction == DOWN)
-    {
-        (*sp).pos_y += (*sp).step_y;
-    }
-    else if ((*sp).direction == UPPER_RIGHT)
-    {
-        (*sp).pos_y -= (*sp).step_y;
-        (*sp).pos_x += (*sp).step_x;
-    }
-    else if ((*sp).direction == UPPER_LEFT)
-    {
-        (*sp).pos_y -= (*sp).step_y;
-        (*sp).pos_x -= (*sp).step_x;
-    }
-    else if ((*sp).direction == BOTTOM_LEFT)
-    {
-        (*sp).pos_y += (*sp).step_y;
-        (*sp).pos_x -= (*sp).step_x;
-    }
-    else if ((*sp).direction == BOTTOM_LEFT)
-    {
-        (*sp).pos_y += (*sp).step_y;
-        (*sp).pos_x += (*sp).step_x;
-    }
-    int i = set_sprite((*sp).data_register, (*sp).pos_x, (*sp).pos_y, (*sp).offset, (*sp).enable);
+    (*sp).pos_x = new_x;
+    (*sp).pos_y = new_y;
+    set_sprite((*sp).data_register, (*sp).pos_x, (*sp).pos_y, (*sp).offset, (*sp).enable);
 }
 
 /**

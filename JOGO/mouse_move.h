@@ -4,7 +4,7 @@
 
 #define MICE_PATH "/dev/input/mice"
 
-int fd;
+int fd_mouse;
 uint16_t pos_x;
 uint16_t pos_y;
 uint8_t left;
@@ -16,4 +16,4 @@ int open_mouse_device();
 
 void close_mouse_device();
 
-int mouse_movement();
+void mouse_movement();
