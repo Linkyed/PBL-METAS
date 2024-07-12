@@ -38,16 +38,20 @@ def return_bg_blocks_codes(image):
         line_num += 1
     return lista
 
-img_sprite = Image.open('imgs/bomba.png')  # Convert image to monochromatic (grayscale)
-img_bg_blocks = Image.open('imgs/pause_screen.png')
+screen = "game_over"
+sprite = "coin"
+
+img_sprite = Image.open(f'imgs/{sprite}.png')  # Convert image to monochromatic (grayscale)
+img_bg_blocks = Image.open(f'imgs/{screen}_screen.png')
 
 img_array_sprite = np.array(img_sprite)
 img_array_bg_blocks = np.array(img_bg_blocks)
 
 
-start = 400
+start = 1200
 lista_sprite = return_pixel_codes(img_array_sprite, start)
 lista_bg_blocks = return_bg_blocks_codes(img_array_bg_blocks)
 
-write_strings_to_file(lista_sprite, 'imgs/codes_txt/bomba_sprite')
+write_strings_to_file(lista_sprite, f'imgs/codes_txt/{sprite}_sprite')
+write_strings_to_file(lista_bg_blocks, f'imgs/codes_txt/{screen}_screen')
 

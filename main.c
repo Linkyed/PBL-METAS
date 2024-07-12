@@ -35,27 +35,108 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
-#include "gpu_lib.h"
-#include "mouse_move.h"
+#include <stdlib.h>
+#include <time.h>
+#include "GPU/gpu_lib.h"
+#include "JOGO/mouse_move.h"
+#include "GPU/screens/draw_screens.h"
+#include "GPU/sprites/draw_sprites.h"
 
-int main()
-{   
-    /* Tentar abrir o arquivo do kernel do driver da GPU */
-    if (open_gpu_device() == 0)
-        return 0;
 
-    set_background_color(0, 0, 0); /* Coloca a cor do background como preto */
-    draw_mouse();
-    set_sprite(1, 0, 0, 25, 1);
+int create_sprite(int array_position, int reg, int x, int y, int offset, int step_x, int step_y, int direction, int sp) {
+    sprites_array[array_position].data_register = reg;
+    sprites_array[array_position].pos_x = x;
+    sprites_array[array_position].pos_y = y;
+    sprites_array[array_position].enable = sp;
+    sprites_array[array_position].offset = offset;
+    sprites_array[array_position].step_x = step_x;
+    sprites_array[array_position].step_y = step_y;
+    sprites_array[array_position].direction = direction;
+    sprites_array[array_position].collision = 0;
+
+    return 1;
+    
+}
+
+int no_repeat_random (int last) {
+    int random_num = rand() % 32;
+    while (last == random_num) {
+        random_num = rand() % 32;
+    }
+    return random_num;
+}
+
+void spaw_enemy (int difficult) {
+    int i = 0;
+    int j = 0;
+
+    srand(time(NULL));
+
+    int random_column = 0;
+    int random_line = 0;
+    // 0 = DIREITA, 1 = ESQUERDA, 2 = BAIXO, 3 = CIMA
+
+    if (difficult == 0) {
+        random_column = rand() % 31;
+        random_line = rand() % 23;
+        create_sprite(31, 31, random_column*20, random_line*20, 2, 5, 5, 0, 1);
+        random_column = no_repeat_random(random_column);
+        random_line = no_repeat_random(random_line);
+        create_sprite(30, 30, random_column*20, random_line*20, 2, 5, 5, 2, 1);
+    }
+    else if (difficult == 1) {
+        
+    }
+
+    else if (difficult == 2) {
+
+    }
+
+}
+
+int main() {
+
+    uint8_t game_state = 0;
+    uint8_t start = 0;
+    uint8_t contador = 0;
+
+    draw_bomb();
+    draw_coin();
+    draw_player();
+    draw_enemy();
+
+    clear_background_blocks();
+    clear_poligonos();
+    clear_sprites();
+
+
     while (1) {
-        mouse_movement();
-        set_sprite(1, pos_x, pos_y, 25, 1);
-        if (left == 1) {
-            break;
+        if (game_state == 0) {
+            draw_pause_screen();
+        }
+        else if (game_state == 1) {
+            if (start == 0) {
+                clear_background_blocks();
+                clear_poligonos();
+                clear_sprites();
+                spaw_enemy(0);
+                start = 1;
+            }
+            if (contador = 10000){
+                static_movement(&sprites_array[31], 1);
+                static_movement(&sprites_array[30], 1);
+                contador = 0;
+            }
+            contador++;
         }
     }
 
-    close_gpu_devide(); /* Fecha o arquivo do driver da GPU */
+    for (int i = 0; i<32; i++) {
+        if (sprites_array[i].enable == 1){
+            printf("POSX=%d, POSY=%d\n", sprites_array[i].pos_x, sprites_array[i].pos_y);
+        }
+    }
+
 
     return 0;
 }

@@ -1,0 +1,43 @@
+# Compiler
+CC = gcc
+
+# Directories for headers
+INCLUDE_DIRS = -IGPU/sprites -IGPU/screens -IGPU -IJOGO
+
+# Source files
+SRCS = main.c \
+       GPU/sprites/draw_sprites.c \
+       GPU/screens/draw_screens.c \
+       GPU/gpu_lib.c \
+       JOGO/mouse_move.c
+
+# Object directory
+OBJ_DIR = object_files
+
+# Object files (derived from source files)
+OBJS = $(patsubst %.c, $(OBJ_DIR)/%.o, $(SRCS))
+
+# Output executable
+EXEC = exec.exe
+
+# Build target
+all: $(EXEC)
+
+# Link the object files to create the executable
+$(EXEC): $(OBJS)
+	$(CC) $(OBJS) -o $@
+
+# Compile each source file to an object file
+$(OBJ_DIR)/%.o: %.c | $(OBJ_DIR)
+	$(CC) $(INCLUDE_DIRS) -c $< -o $@
+
+# Create the object directory if it does not exist
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)/GPU/sprites $(OBJ_DIR)/GPU/screens $(OBJ_DIR)/GPU $(OBJ_DIR)/JOGO
+
+# Clean target to remove object files and executable
+clean:
+	rm -rf $(OBJ_DIR) $(EXEC)
+
+# Phony targets
+.PHONY: all clean
