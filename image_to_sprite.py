@@ -10,14 +10,13 @@ def return_pixel_codes(image, start):
     lista = []
     for line in image:
         for pixel in line:
-            start += 1
-            if (pixel[3] == 0):
-                lista.append(f"set_sprite_pixel_color({start}, 6, 7, 7);")
-            else:
+            if (pixel[3] != 0):
                 red = pixel[0] // 32
                 green = pixel[1] // 32
                 blue = pixel[1] // 32
                 lista.append(f"set_sprite_pixel_color({start}, {red}, {green}, {blue});")
+                
+            start += 1
     return lista
 
 
@@ -27,9 +26,7 @@ def return_bg_blocks_codes(image):
     for line in image:
         column_num = 0
         for column in line:
-            if (column[3] == 0):
-                lista.append(f"set_background_block({column_num}, {line_num}, 6, 7, 7);")
-            else:
+            if (column[3] != 0):
                 red = column[0] // 32
                 green = column[1] // 32
                 blue = column[1] // 32
@@ -38,7 +35,7 @@ def return_bg_blocks_codes(image):
         line_num += 1
     return lista
 
-screen = "game_over"
+screen = "restart"
 sprite = "coin"
 
 img_sprite = Image.open(f'imgs/{sprite}.png')  # Convert image to monochromatic (grayscale)

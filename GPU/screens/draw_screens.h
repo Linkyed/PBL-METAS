@@ -9,6 +9,10 @@ void draw_pause_screen();
 
 void draw_win_screen();
 
+void draw_fase_screen(int number);
+
+void draw_restart_screen();
+
 void draw_game_over_screen();
 
 #endif // DRAW_SCREEN_H

@@ -47,7 +47,7 @@ void mouse_movement()
     if (pos_x > 620)
     {
         //printf("MOVE X: %d\n", data[1]);
-        pos_x = 0;
+        pos_x = 620;
     }
 
     if (pos_y < 0)

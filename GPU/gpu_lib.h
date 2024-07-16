@@ -79,7 +79,7 @@ uint16_t enable;                                     /*!< Habilita/Desabilita a 
 } Sprite_Fixed;
 
 extern Sprite_Fixed fixed_sprites_array[5];
-extern Sprite sprites_array[5];
+extern Sprite sprites_array[32];
 
 uint8_t set_sprite(uint8_t reg, uint16_t x, uint16_t y, uint8_t offset, uint8_t sp);
 
@@ -118,5 +118,9 @@ void draw_sprites_PMD();
 void draw_mouse();
 
 void static_movement(Sprite *sp, uint8_t mirror);
+
+void clear_all();
+
+void void reset_sprites();
 
 #endif /* GPU_LIB_H */

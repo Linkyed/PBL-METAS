@@ -42,7 +42,7 @@
 int fd = 0;
 
 Sprite_Fixed fixed_sprites_array[5];
-Sprite sprites_array[5];
+Sprite sprites_array[32];
 
 
 /**
@@ -327,6 +327,8 @@ uint8_t create_sprite(uint8_t array_position, uint8_t reg, uint16_t x, uint16_t 
     sprites_array[array_position].direction = direction;
     sprites_array[array_position].collision = 0;
 
+    printf("POSX: %d, POSY: %d\n", x, y);
+
     int ok = set_sprite(reg, x, y, offset, sp);
     return ok;
     
@@ -357,38 +359,65 @@ void clear_sprites()
 }
 
 void static_movement(Sprite *sp, uint8_t mirror)
-{
+{   
     if ((*sp).direction == 0) { /* DIREITA */
+        //printf("PASSOU AQUI: mirroe %d\n", ((*sp).pos_x + (*sp).step_x) > 620);
         if (mirror == 1 && (*sp).pos_x + (*sp).step_x > 620) {
+            //printf("PASSOU AQUI2\n");
+            (*sp).pos_x = 0;
             set_sprite((*sp).data_register, 0, (*sp).pos_y, (*sp).offset, (*sp).enable);
         }
-        else if ((*sp).pos_x + (*sp).step_x < 620){
-            set_sprite((*sp).data_register, (*sp).pos_x + (*sp).step_x, (*sp).pos_y, (*sp).offset, (*sp).enable);
+        else{
+            int a = (*sp).pos_x + (*sp).step_x;
+            (*sp).pos_x = a;
+            set_sprite((*sp).data_register, a, (*sp).pos_y, (*sp).offset, (*sp).enable);
         }
     }
     else if ((*sp).direction == 1) { /*ESQUERDA */
+        printf("enable: %d, POSX: %d\n", (*sp).enable, (*sp).pos_x);
         if (mirror == 1 && (*sp).pos_x - (*sp).step_x < 0) {
+            (*sp).pos_x = 620;
             set_sprite((*sp).data_register, 620, (*sp).pos_y, (*sp).offset, (*sp).enable);
         }
-        else if ((*sp).pos_x - (*sp).step_x > 0){
+        else {
+            (*sp).pos_x = (*sp).pos_x - (*sp).step_x;
             set_sprite((*sp).data_register, (*sp).pos_x - (*sp).step_x, (*sp).pos_y, (*sp).offset, (*sp).enable);
         }
     }
     else if ((*sp).direction == 2) { /*BAIXO */
         
         if (mirror == 1 && (*sp).pos_y + (*sp).step_y > 460) {
+            (*sp).pos_y = 0;
             set_sprite((*sp).data_register, (*sp).pos_x, 0, (*sp).offset, (*sp).enable);
         }
-        else if ((*sp).pos_y + (*sp).step_y < 460){
-            set_sprite((*sp).data_register, (*sp).pos_x, (*sp).pos_y + (*sp).step_y, (*sp).offset, (*sp).enable);
+        else{
+            int a = (*sp).pos_y + (*sp).step_y;
+            (*sp).pos_y = a;
+            set_sprite((*sp).data_register, (*sp).pos_x, a, (*sp).offset, (*sp).enable);
         }
     }
     else if ((*sp).direction == 3) { /*CIMA */
         if (mirror == 1 && (*sp).pos_y - (*sp).step_y < 0) {
+            (*sp).pos_y = 460;
             set_sprite((*sp).data_register, (*sp).pos_x, 460, (*sp).offset, (*sp).enable);
         }
-        else if ((*sp).pos_y - (*sp).step_y > 0){
+        else {
+            (*sp).pos_y = (*sp).pos_y - (*sp).step_y;
             set_sprite((*sp).data_register, (*sp).pos_x, (*sp).pos_y - (*sp).step_y, (*sp).offset, (*sp).enable);
+        }
+    }
+}
+void clear_all() {
+    clear_background_blocks();
+    clear_poligonos();
+    clear_sprites();
+}
+
+void reset_sprites() {
+    int i = 0;
+    for(i; i < 31; i++) {
+        if (sprites_array[i].enable == 1) {
+            set_sprite(sprites_array[i].data_register, sprites_array[i].pos_x, sprites_array[i].pos_y, sprites_array[i].offset, 1);
         }
     }
 }
