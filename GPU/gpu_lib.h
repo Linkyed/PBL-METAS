@@ -121,6 +121,6 @@ void static_movement(Sprite *sp, uint8_t mirror);
 
 void clear_all();
 
-void void reset_sprites();
+void reset_sprites();
 
 #endif /* GPU_LIB_H */

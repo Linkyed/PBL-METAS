@@ -9,6 +9,12 @@ void draw_enemy();
 
 void draw_bomb();
 
+void draw_bomb_animation();
+
+void draw_ghost();
+
 void draw_coin();
+
+void draw_player_shild();
 
 #endif // DRAW_SPRITE_H

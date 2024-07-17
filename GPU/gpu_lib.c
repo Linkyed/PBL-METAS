@@ -327,8 +327,6 @@ uint8_t create_sprite(uint8_t array_position, uint8_t reg, uint16_t x, uint16_t 
     sprites_array[array_position].direction = direction;
     sprites_array[array_position].collision = 0;
 
-    printf("POSX: %d, POSY: %d\n", x, y);
-
     int ok = set_sprite(reg, x, y, offset, sp);
     return ok;
     
@@ -374,7 +372,6 @@ void static_movement(Sprite *sp, uint8_t mirror)
         }
     }
     else if ((*sp).direction == 1) { /*ESQUERDA */
-        printf("enable: %d, POSX: %d\n", (*sp).enable, (*sp).pos_x);
         if (mirror == 1 && (*sp).pos_x - (*sp).step_x < 0) {
             (*sp).pos_x = 620;
             set_sprite((*sp).data_register, 620, (*sp).pos_y, (*sp).offset, (*sp).enable);

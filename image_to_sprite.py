@@ -35,8 +35,8 @@ def return_bg_blocks_codes(image):
         line_num += 1
     return lista
 
-screen = "restart"
-sprite = "coin"
+screen = "bg_jogo"
+sprite = "player_shild"
 
 img_sprite = Image.open(f'imgs/{sprite}.png')  # Convert image to monochromatic (grayscale)
 img_bg_blocks = Image.open(f'imgs/{screen}_screen.png')
@@ -45,7 +45,7 @@ img_array_sprite = np.array(img_sprite)
 img_array_bg_blocks = np.array(img_bg_blocks)
 
 
-start = 1200
+start = 2400
 lista_sprite = return_pixel_codes(img_array_sprite, start)
 lista_bg_blocks = return_bg_blocks_codes(img_array_bg_blocks)
 

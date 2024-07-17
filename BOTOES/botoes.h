@@ -15,6 +15,10 @@ extern int botao1;
 extern int botao2;
 extern int botao3;
 
+extern volatile int *KEY_ptr;
+extern int fd_botoes;
+extern void *LW_virtual;
+
 int open_botoes_device();
 
 void read_botoes();

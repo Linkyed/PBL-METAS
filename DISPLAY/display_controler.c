@@ -48,6 +48,27 @@ void write_number_display(int display_digit, int number) {
 
 }
 
+void write_score (int score) {
+    int dezena = score/10;
+    int unidade = score % 10;
+
+    write_number_display(1, dezena);
+    write_number_display(0, unidade);
+
+}
+
+void write_lifes (int vidas) {
+    int dezena = vidas/10;
+    int unidade = vidas % 10;
+
+    write_number_display(5, dezena);
+    write_number_display(4, unidade);
+}
+
+void write_start_display() {
+    
+}
+
 void close_display_device() {
     munmap(LW_virtual, LW_BRIDGE_SPAN);
     close(fd);
